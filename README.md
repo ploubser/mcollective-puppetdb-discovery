@@ -1,0 +1,2 @@
+mcollective-puppetdb-discovery
+==============================
