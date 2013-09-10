@@ -63,7 +63,7 @@ module MCollective
         end
 
         query = transform_query(query, 'node')
-        JSON.parse(make_request('nodes', URI.encode(query.to_json))).map { |node| node['name'] }
+        JSON.parse(make_request('nodes', query.to_json)).map { |node| node['name'] }
       end
 
       # Retrieves the list hosts by querying the puppetdb resource endpoint,
@@ -83,7 +83,7 @@ module MCollective
 
         query = transform_query(query, 'klass')
 
-        JSON.parse(make_request('resources', URI.encode(query.to_json))).each do |result|
+        JSON.parse(make_request('resources', query.to_json)).each do |result|
           query_results[result['title']] << result['certname']
         end
 
@@ -114,10 +114,10 @@ module MCollective
       end
 
       def make_request(endpoint, query)
-        request = "/v2/%s" % endpoint
-        request += "?query=%s" % query if query
-
-        resp, data = @http.get(request, {'accept' => 'application/json'})
+        request = Net::HTTP::Get.new("/v2/%s" % endpoint, {'accept' => 'application/json'})
+        request.set_form_data({"query" => query}) if query
+        resp, data = @http.request(request)
+        data = resp.body if data.nil?
         raise 'Failed to make request to PuppetDB: %s: %s' % [resp.code, resp.message] unless resp.code == '200'
         data
       end
