@@ -117,9 +117,9 @@ module MCollective
         request = "/v2/%s" % endpoint
         request += "?query=%s" % query if query
 
-        resp, data = @http.get(request, {'accept' => 'application/json'})
+        resp = @http.get(request, {'accept' => 'application/json'})
         raise 'Failed to make request to PuppetDB: %s: %s' % [resp.code, resp.message] unless resp.code == '200'
-        data
+        resp.body
       end
 
       # Transforms a list of queries into single, complex query
