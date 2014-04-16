@@ -23,6 +23,7 @@ Other configuration settings that can be tuned depending our your PuppetDB insta
  * discovery.puppetdb.host - The hostname of the PuppetDB server. Defaults to localhost
  * discovery.puppetdb.port - The unencrpyted HTTP __or__ SSL port your PuppetDB server listens on. Defaults to 8080
  * discovery.puppetdb.use_ssl - Enable using SSL. Defaults to false
+ * discovery.puppetdb.use_krb - Enable using Kerberos. Defaults to false
 
 The following settings should only be configured if you are using SSL communications. They will all be disabled by default.
 
@@ -49,3 +50,15 @@ Connect to a remote PuppetDB server using SSL
      plugin.discovery.puppetdb.ssl_ca = /etc/mcollective/puppetdb/ca.pem
      plugin.discovery.puppetdb.ssl_cert = /etc/mcollective/puppetdb/host1.your.com.cert.pem
      plugin.discovery.puppetdb.ssl_private_key = /etc/mcollective/puppetdb/host1.your.com.pem
+
+Connect to a remote PuppetDB server using Kerberos
+
+     default_discovery_method = puppetdb
+
+     plugin.discovery.puppetdb.host = puppetdb.your.com
+     plugin.discovery.puppetdb.port = 8082
+     plugin.discovery.puppetdb.use_krb = 1
+     plugin.discovery.puppetdb.ssl_ca = /etc/mcollective/puppetdb/ca.pem
+     plugin.discovery.puppetdb.ssl_cert = /etc/mcollective/puppetdb/host1.your.com.cert.pem
+     plugin.discovery.puppetdb.ssl_private_key = /etc/mcollective/puppetdb/host1.your.com.pem
+
