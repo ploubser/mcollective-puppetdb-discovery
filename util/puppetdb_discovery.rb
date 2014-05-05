@@ -5,9 +5,6 @@ module MCollective
 
       def initialize(config)
         require 'net/http'
-        require 'rubygems'
-        require 'httpi'
-        require 'curb'
 
         @config = {}
         @config[:ssl] = config.pluginconf.fetch('discovery.puppetdb.use_ssl', 'n')
@@ -46,6 +43,9 @@ module MCollective
 
       # With HTTPI and curb for Kerberos support 
       def create_http_krb
+        require 'rubygems'
+        require 'httpi'
+        require 'curb'
         req = HTTPI::Request.new()
         req.auth.ssl.verify_mode = :none
         req.auth.gssnegotiate
