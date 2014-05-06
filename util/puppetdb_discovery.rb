@@ -8,6 +8,7 @@ module MCollective
 
         @config = {}
         @config[:ssl] = config.pluginconf.fetch('discovery.puppetdb.use_ssl', 'n')
+        @config[:krb] = config.pluginconf.fetch('discovery.puppetdb.use_krb', 'n')
         @config[:host] = config.pluginconf.fetch('discovery.puppetdb.host', 'localhost')
         @config[:port] = config.pluginconf.fetch('discovery.puppetdb.port', 8080)
         @config[:ssl_ca] = config.pluginconf.fetch('discovery.puppetdb.ssl_ca', nil)
@@ -31,9 +32,25 @@ module MCollective
       end
 
       def create_http
-        http = Net::HTTP.new(@config[:host], @config[:port])
-        configure_ssl(http) if @config[:ssl] =~ /^1|y|t/
+        if @config[:krb] =~ /^1|y|t/
+          create_http_krb
+        else
+          http = Net::HTTP.new(@config[:host], @config[:port])
+          configure_ssl(http) if @config[:ssl] =~ /^1|y|t/
           http
+        end
+      end
+
+      # With HTTPI and curb for Kerberos support 
+      def create_http_krb
+        require 'rubygems'
+        require 'httpi'
+        require 'curb'
+        req = HTTPI::Request.new()
+        req.auth.ssl.verify_mode = :none
+        req.auth.gssnegotiate
+        HTTPI.adapter = :curb
+        req
       end
 
       # Configure the http object to use SSL.
@@ -63,7 +80,7 @@ module MCollective
         end
 
         query = transform_query(query, 'node')
-        JSON.parse(make_request('nodes', query.to_json)).map { |node| node['name'] }
+        JSON.parse(make_request('nodes', URI.encode(query.to_json))).map { |node| node['name'] }
       end
 
       # Retrieves the list hosts by querying the puppetdb resource endpoint,
@@ -83,7 +100,7 @@ module MCollective
 
         query = transform_query(query, 'klass')
 
-        JSON.parse(make_request('resources', query.to_json)).each do |result|
+        JSON.parse(make_request('resources', URI.encode(query.to_json))).each do |result|
           query_results[result['title']] << result['certname']
         end
 
@@ -114,12 +131,30 @@ module MCollective
       end
 
       def make_request(endpoint, query)
+        if @config[:krb] =~ /^1|y|t/
+          make_request_krb(endpoint, query)
+        else
+          make_request_normal(endpoint, query)
+        end
+      end
+
+      def make_request_normal(endpoint, query)
         request = Net::HTTP::Get.new("/v2/%s" % endpoint, {'accept' => 'application/json'})
         request.set_form_data({"query" => query}) if query
         resp, data = @http.request(request)
         data = resp.body if data.nil?
         raise 'Failed to make request to PuppetDB: %s: %s' % [resp.code, resp.message] unless resp.code == '200'
         data
+      end
+
+      # With HTTPI and curb for Kerberos support 
+      def make_request_krb(endpoint, query)
+        request = "/v2/%s" % endpoint
+        request += "?query=%s" % query if query
+        @http.url = "https://#{@config[:host]}:#{@config[:port]}" + request
+        resp = HTTPI.get(@http)
+        raise 'Failed to make request to PuppetDB: code %s' % [resp.code] if resp.error?
+        resp.raw_body
       end
 
       # Transforms a list of queries into single, complex query
@@ -154,3 +189,4 @@ module MCollective
     end
   end
 end
+
