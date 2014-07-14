@@ -18,12 +18,12 @@ module MCollective
         @http = create_http
       end
 
-      def discover(filter)
+      def discover(filter,query=nil)
         found = []
 
         #if no filters are to be applied, we fetch all the nodes registered in puppetdb
         if filter['fact'].empty? && filter['cf_class'].empty? && filter['identity'].empty?
-          found = node_search
+          found = node_search(query)
         else
           found << fact_search(filter['fact']) unless filter['fact'].empty?
           found << class_search(filter['cf_class']) unless filter['cf_class'].empty?
@@ -131,9 +131,9 @@ module MCollective
         hosts
       end
 
-      # Looks up all the nodes registered in puppetdb without applying any filters
-      def node_search
-        JSON.parse(make_request('nodes', nil)).map { |node| node['name'] }
+      # Looks up all the nodes registered in puppetdb with an optional filter
+      def node_search(query=nil)
+        JSON.parse(make_request('nodes', query)).map { |node| node['name'] }
       end
 
       def make_request(endpoint, query)
