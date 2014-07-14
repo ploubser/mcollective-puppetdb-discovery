@@ -17,12 +17,12 @@ module MCollective
         @http = create_http
       end
 
-      def discover(filter)
+      def discover(filter,query=nil)
         found = []
 
         #if no filters are to be applied, we fetch all the nodes registered in puppetdb
         if filter['fact'].empty? && filter['cf_class'].empty? && filter['identity'].empty?
-          found = node_search
+          found = node_search(query)
         else
           found << fact_search(filter['fact']) unless filter['fact'].empty?
           found << class_search(filter['cf_class']) unless filter['cf_class'].empty?
@@ -125,9 +125,9 @@ module MCollective
         hosts
       end
 
-      # Looks up all the nodes registered in puppetdb without applying any filters
-      def node_search
-        JSON.parse(make_request('nodes', nil)).map { |node| node['name'] }
+      # Looks up all the nodes registered in puppetdb with an optional filter
+      def node_search(query=nil)
+        JSON.parse(make_request('nodes', query)).map { |node| node['name'] }
       end
 
       def make_request(endpoint, query)
@@ -139,7 +139,7 @@ module MCollective
       end
 
       def make_request_normal(endpoint, query)
-        request = Net::HTTP::Get.new("/v2/%s" % endpoint, {'accept' => 'application/json'})
+        request = Net::HTTP::Get.new("/v3/%s" % endpoint, {'accept' => 'application/json'})
         request.set_form_data({"query" => query}) if query
         resp, data = @http.request(request)
         data = resp.body if data.nil?
@@ -149,7 +149,7 @@ module MCollective
 
       # With HTTPI and curb for Kerberos support 
       def make_request_krb(endpoint, query)
-        request = "/v2/%s" % endpoint
+        request = "/v3/%s" % endpoint
         request += "?query=%s" % query if query
         @http.url = "https://#{@config[:host]}:#{@config[:port]}" + request
         resp = HTTPI.get(@http)
