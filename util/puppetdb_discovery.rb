@@ -76,11 +76,11 @@ module MCollective
 
         filter.each do |fact|
           op, value = translate_value(fact[:value], fact[:operator])
-          query << [op, ['fact', fact[:fact]], value]
+          query << [op, ['fact', URI.encode(fact[:fact])], URI.encode(value)]
         end
 
         query = transform_query(query, 'node')
-        JSON.parse(make_request('nodes', URI.encode(query.to_json))).map { |node| node['name'] }
+        JSON.parse(make_request('nodes', query.to_json)).map { |node| node['name'] }
       end
 
       # Retrieves the list hosts by querying the puppetdb resource endpoint,
@@ -95,12 +95,12 @@ module MCollective
 
         filter.each do |klass|
           op, value = translate_value(klass, '=')
-          query << ['and', ['=', 'type', 'Class'], [op, 'title', value]]
+          query << ['and', ['=', 'type', 'Class'], [op, 'title', URI.encode(value)]]
         end
 
         query = transform_query(query, 'klass')
 
-        JSON.parse(make_request('resources', URI.encode(query.to_json))).each do |result|
+        JSON.parse(make_request('resources', query.to_json)).each do |result|
           query_results[result['title']] << result['certname']
         end
 
