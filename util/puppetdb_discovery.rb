@@ -76,7 +76,9 @@ module MCollective
 
         filter.each do |fact|
           op, value = translate_value(fact[:value], fact[:operator])
-          query << [op, ['fact', URI.encode(fact[:fact])], URI.encode(value)]
+          new_query = [op, ['fact', URI.encode(fact[:fact])], URI.encode(value)]
+          new_query = [ "not", new_query ] if fact[:operator] == '!='
+          query << new_query
         end
 
         query = transform_query(query, 'node')
@@ -182,7 +184,7 @@ module MCollective
           op = '~'
         end
 
-        op = '=' if op == '=='
+        op = '=' if (op == '==' or op == "!=")
 
         return op, value
       end
