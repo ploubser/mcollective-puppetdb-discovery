@@ -92,6 +92,7 @@ module MCollective
       def class_search(filter)
         query = []
         query_results = {}
+        host_hash = {}
         filter.map! { |f| f.split("::").map { |i| i.capitalize }.join("::") }
         filter.each { |f| query_results[f] = [] }
 
@@ -103,11 +104,10 @@ module MCollective
         query = transform_query(query, 'klass')
 
         JSON.parse(make_request('resources', query.to_json)).each do |result|
-          query_results[result['title']] << result['certname']
+          host_hash[result['certname']] = true
         end
 
-        host_arrays = query_results.values
-        host_arrays.inject(host_arrays[0]) { |x,y| x & y }
+        host_hash.keys
       end
 
       # Retrieves the list of hosts by querying puppetdb's node endpoint
