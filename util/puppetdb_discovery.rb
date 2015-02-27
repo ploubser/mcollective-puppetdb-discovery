@@ -176,11 +176,11 @@ module MCollective
 
       # Translates the op and value used in a query so that the
       # op matches the comparison characters used by PuppetDB.
-      # Regular expressions will have the '/' characters removed
-      # and the correct op value will be set
+      # Regular expressions will have the first and last '/'
+      # characters removed and the correct op value will be set
       def translate_value(value, op)
-        if value =~ /^\//
-          value = value.gsub('/', '')
+        if value =~ /^\/.*\/$/
+          value = value.gsub(/^\/|\/$/, '')
           op = '~'
         end
 
