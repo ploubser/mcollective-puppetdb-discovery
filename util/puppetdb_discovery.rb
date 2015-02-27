@@ -151,9 +151,8 @@ module MCollective
 
       # With HTTPI and curb for Kerberos support 
       def make_request_krb(endpoint, query)
-        request = "/v2/%s" % endpoint
-        request += "?query=%s" % query if query
-        @http.url = "https://#{@config[:host]}:#{@config[:port]}" + request
+        require 'cgi'
+        @http.url = "https://#{@config[:host]}:#{@config[:port]}/v2/#{endpoint}" + (query ? "?query=#{CGI.escape(query)}" : '')
         resp = HTTPI.get(@http)
         raise 'Failed to make request to PuppetDB: code %s' % [resp.code] if resp.error?
         resp.raw_body
