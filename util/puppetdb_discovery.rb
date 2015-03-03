@@ -49,6 +49,7 @@ module MCollective
         req = HTTPI::Request.new()
         req.auth.ssl.verify_mode = :none
         req.auth.gssnegotiate
+        HTTPI.log = false
         HTTPI.adapter = :curb
         req
       end
