@@ -29,6 +29,7 @@ module MCollective
         result.config[:ssl_ca].should == nil
         result.config[:ssl_cert].should == nil
         result.config[:ssl_key].should == nil
+        result.config[:api_version].should == '3'
       end
 
         it 'should set custom configuration values and create an http object' do
@@ -38,7 +39,9 @@ module MCollective
                            'discovery.puppetdb.port' => '8081',
                            'discovery.puppetdb.ssl_ca' => 'rspec/ca.pem',
                            'discovery.puppetdb.ssl_cert' => 'rspec/host.your.com.cert.pem',
-                           'discovery.puppetdb.ssl_private_key' => 'rspec/host.your.com.pem' }
+                           'discovery.puppetdb.ssl_private_key' => 'rspec/host.your.com.pem',
+                           'discovery.puppetdb.api_version' => '4',
+                         }
 
           config.stubs(:pluginconf).returns(pluginconf)
 
@@ -49,6 +52,7 @@ module MCollective
           result.config[:ssl_ca].should == 'rspec/ca.pem'
           result.config[:ssl_cert].should == 'rspec/host.your.com.cert.pem'
           result.config[:ssl_key].should == 'rspec/host.your.com.pem'
+          result.config[:api_version].should == '4'
         end
       end
 
