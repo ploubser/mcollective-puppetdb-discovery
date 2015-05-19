@@ -14,6 +14,7 @@ module MCollective
         @config[:ssl_ca] = config.pluginconf.fetch('discovery.puppetdb.ssl_ca', nil)
         @config[:ssl_cert] = config.pluginconf.fetch('discovery.puppetdb.ssl_cert', nil)
         @config[:ssl_key] = config.pluginconf.fetch('discovery.puppetdb.ssl_private_key', nil)
+        @config[:api_version] = config.pluginconf.fetch('discovery.puppetdb.api_version', '2')
         @http = create_http
       end
 
@@ -142,7 +143,7 @@ module MCollective
       end
 
       def make_request_normal(endpoint, query)
-        request = Net::HTTP::Get.new("/v2/%s" % endpoint, {'accept' => 'application/json'})
+        request = Net::HTTP::Get.new("/v#{@config[:api_version]}/%s" % endpoint, {'accept' => 'application/json'})
         request.set_form_data({"query" => query}) if query
         resp, data = @http.request(request)
         data = resp.body if data.nil?
@@ -153,7 +154,7 @@ module MCollective
       # With HTTPI and curb for Kerberos support 
       def make_request_krb(endpoint, query)
         require 'cgi'
-        @http.url = "https://#{@config[:host]}:#{@config[:port]}/v2/#{endpoint}" + (query ? "?query=#{CGI.escape(query)}" : '')
+        @http.url = "https://#{@config[:host]}:#{@config[:port]}/v#{@config[:api_version]}/#{endpoint}" + (query ? "?query=#{CGI.escape(query)}" : '')
         resp = HTTPI.get(@http)
         raise 'Failed to make request to PuppetDB: code %s' % [resp.code] if resp.error?
         resp.raw_body
