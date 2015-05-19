@@ -14,7 +14,7 @@ module MCollective
         @config[:ssl_ca] = config.pluginconf.fetch('discovery.puppetdb.ssl_ca', nil)
         @config[:ssl_cert] = config.pluginconf.fetch('discovery.puppetdb.ssl_cert', nil)
         @config[:ssl_key] = config.pluginconf.fetch('discovery.puppetdb.ssl_private_key', nil)
-        @config[:api_version] = config.pluginconf.fetch('discovery.puppetdb.api_version', '2')
+        @config[:api_version] = config.pluginconf.fetch('discovery.puppetdb.api_version', '3')
         @http = create_http
       end
 

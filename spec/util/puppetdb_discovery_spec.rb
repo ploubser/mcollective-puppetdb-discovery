@@ -29,7 +29,7 @@ module MCollective
         result.config[:ssl_ca].should == nil
         result.config[:ssl_cert].should == nil
         result.config[:ssl_key].should == nil
-        result.config[:api_version].should == '2'
+        result.config[:api_version].should == '3'
       end
 
         it 'should set custom configuration values and create an http object' do
