@@ -78,7 +78,11 @@ module MCollective
 
         filter.each do |fact|
           op, value = translate_value(fact[:value], fact[:operator])
-          new_query = [op, ['fact', URI.encode(fact[:fact])], URI.encode(value)]
+          if @config[:api_version] == '4' && fact[:fact] == 'environment'
+            new_query = [op, "facts-environment", URI.encode(value)]
+          else
+            new_query = [op, ['fact', URI.encode(fact[:fact])], URI.encode(value)]
+          end
           new_query = [ "not", new_query ] if fact[:operator] == '!='
           query << new_query
         end
