@@ -84,7 +84,7 @@ module MCollective
         end
 
         query = transform_query(query, 'node')
-        JSON.parse(make_request('nodes', query.to_json)).map { |node| node['name'] }
+        JSON.parse(make_request('nodes', query.to_json)).map { |node| node['name'] || node['certname'] }
       end
 
       # Retrieves the list hosts by querying the puppetdb resource endpoint,
