@@ -2,7 +2,7 @@ metadata    :name        => "puppetdb discovery",
             :description => "PuppetDB based discovery",
             :author      => "Pieter Loubser <ploubser@gmail.com>",
             :license     => "ASL 2.0",
-            :version     => "0.2",
+            :version     => "0.3",
             :url         => "http://marionette-collective.org/",
             :timeout     => 0
 
