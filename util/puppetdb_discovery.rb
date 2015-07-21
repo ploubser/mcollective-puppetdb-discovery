@@ -97,13 +97,11 @@ module MCollective
       # calculated to simulate an and query.
       def class_search(filter)
         query = []
-        query_results = {}
         host_hash = {}
-        filter.map! { |f| f.split("::").map { |i| i.capitalize }.join("::") }
-        filter.each { |f| query_results[f] = [] }
 
         filter.each do |klass|
           op, value = translate_value(klass, '=')
+          value = value.split("::").map { |i| i.capitalize }.join("::")
           query << ['and', ['=', 'type', 'Class'], [op, 'title', URI.encode(value)]]
         end
 
