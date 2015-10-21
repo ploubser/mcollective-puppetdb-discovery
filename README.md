@@ -17,6 +17,8 @@ The PuppetDB discovery plugin can be activated either by specifying it in your c
 or by using it on the cli
 
     % mco rpc rpcutil ping --dm puppetdb -F operatingsytem=CentOS
+    % mco rpc rpcutil ping --dm puppetdb --do '["in", "certname", ["extract", "certname", ["select-resources", ["and", ["=", "type", "Apache::Vhost"], ["=", "title", "myvhost"]]]]]'
+
 
 Other configuration settings that can be tuned depending our your PuppetDB installation are :
 
@@ -61,4 +63,12 @@ Connect to a remote PuppetDB server using Kerberos
      plugin.discovery.puppetdb.ssl_ca = /etc/mcollective/puppetdb/ca.pem
      plugin.discovery.puppetdb.ssl_cert = /etc/mcollective/puppetdb/host1.your.com.cert.pem
      plugin.discovery.puppetdb.ssl_private_key = /etc/mcollective/puppetdb/host1.your.com.pem
+
+###Example client implementations
+
+Discover nodes whith a custom puppetdb query
+
+     mc.discovery_method  = "puppetdb"
+     mc.discovery_options = ["in", "certname", ["extract", "certname", ["select-resources", ["and", ["=", "type", "Apache::Vhost"], ["=", "title", "myvhost"]]]]].inspect
+
 
