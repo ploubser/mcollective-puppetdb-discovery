@@ -133,7 +133,7 @@ module MCollective
 
       # Looks up all the nodes registered in puppetdb without applying any filters
       def node_search
-        JSON.parse(make_request('nodes', nil)).map { |node| node['name'] }
+        JSON.parse(make_request('nodes', nil)).map { |node| node['name'] || node['certname'] }
       end
 
       def make_request(endpoint, query)
