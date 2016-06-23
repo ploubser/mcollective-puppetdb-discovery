@@ -15,12 +15,19 @@ module MCollective
         @config[:ssl_cert] = config.pluginconf.fetch('discovery.puppetdb.ssl_cert', nil)
         @config[:ssl_key] = config.pluginconf.fetch('discovery.puppetdb.ssl_private_key', nil)
         @config[:api_version] = config.pluginconf.fetch('discovery.puppetdb.api_version', '3')
+        @config[:collective_fact] = config.pluginconf.fetch('discovery.puppetdb.collective_fact', nil)
         @http = create_http
       end
 
       def discover(filter)
         found = []
 
+        unless @config[:collective_fact].nil?
+            unless filter.has_key?('fact')
+                filter['fact'] = Array.new
+            end
+            filter['fact'].push({:fact=>@config[:collective_fact], :value=>filter['collective'], :operator=>"="})
+        end
         #if no filters are to be applied, we fetch all the nodes registered in puppetdb
         if filter['fact'].empty? && filter['cf_class'].empty? && filter['identity'].empty?
           found = node_search
