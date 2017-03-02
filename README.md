@@ -24,6 +24,7 @@ Other configuration settings that can be tuned depending our your PuppetDB insta
  * discovery.puppetdb.port - The unencrpyted HTTP __or__ SSL port your PuppetDB server listens on. Defaults to 8080
  * discovery.puppetdb.use_ssl - Enable using SSL. Defaults to false
  * discovery.puppetdb.use_krb - Enable using Kerberos. Defaults to false
+ * discovery.puppetdb.collective_fact - Define a fact to filter all queries with the value of the collective thus avoiding to fetch all the nodes registered in puppetdb each time. Defaults to false
 
 The following settings should only be configured if you are using SSL communications. They will all be disabled by default.
 
@@ -61,4 +62,10 @@ Connect to a remote PuppetDB server using Kerberos
      plugin.discovery.puppetdb.ssl_ca = /etc/mcollective/puppetdb/ca.pem
      plugin.discovery.puppetdb.ssl_cert = /etc/mcollective/puppetdb/host1.your.com.cert.pem
      plugin.discovery.puppetdb.ssl_private_key = /etc/mcollective/puppetdb/host1.your.com.pem
+
+Filter all queries using the hostgroup_0 fact
+
+     plugin.discovery.puppetdb.collective_fact = hostgroup_0
+
+The effect would be equivalent to -F hostgroup_0=<collective> in the command line
 
