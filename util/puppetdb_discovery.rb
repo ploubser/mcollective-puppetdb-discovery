@@ -152,7 +152,12 @@ module MCollective
       end
 
       def make_request_normal(endpoint, query)
-        request = Net::HTTP::Get.new("/v#{@config[:api_version]}/%s" % endpoint, {'accept' => 'application/json'})
+        if @config[:api_version] >= '4'
+          request = Net::HTTP::Get.new("/pdb/query/v#{@config[:api_version]}/%s" % endpoint, {'accept' => 'application/json'})
+        else
+          request = Net::HTTP::Get.new("/v#{@config[:api_version]}/%s" % endpoint, {'accept' => 'application/json'})
+        end
+
         request.set_form_data({"query" => query}) if query
         resp, data = @http.request(request)
         data = resp.body if data.nil?
@@ -163,7 +168,12 @@ module MCollective
       # With HTTPI and curb for Kerberos support 
       def make_request_krb(endpoint, query)
         require 'cgi'
-        @http.url = "https://#{@config[:host]}:#{@config[:port]}/v#{@config[:api_version]}/#{endpoint}" + (query ? "?query=#{CGI.escape(query)}" : '')
+        if @config[:api_version] >= '4'
+          @http.url = "https://#{@config[:host]}:#{@config[:port]}/pdb/query/v#{@config[:api_version]}/#{endpoint}" + (query ? "?query=#{CGI.escape(query)}" : '')
+        else
+          @http.url = "https://#{@config[:host]}:#{@config[:port]}/v#{@config[:api_version]}/#{endpoint}" + (query ? "?query=#{CGI.escape(query)}" : '')
+        end
+
         resp = HTTPI.get(@http)
         raise 'Failed to make request to PuppetDB: code %s' % [resp.code] if resp.error?
         resp.raw_body
